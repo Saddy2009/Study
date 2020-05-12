@@ -1,0 +1,56 @@
+package com.dtest;
+ 
+import java.io.*;
+import java.lang.StringBuffer ;
+ 
+class MemInfo{
+    public static String getMemory(String packageName) throws IOException, InterruptedException{
+        String str = null;
+ 
+        try {
+            Runtime runtime = Runtime.getRuntime();
+            Process proc = runtime.exec("adb shell dumpsys meminfo | grep " + packageName);
+ 
+            try{
+                if(proc.waitFor() != 0){
+                    System.err.println("exit value = " + proc.exitValue());
+                }
+                BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+ 
+                StringBuffer sf = new StringBuffer();
+ 
+                String line = null;
+                while((line = br.readLine()) != null){
+                    sf.append(line + "\n");
+                }
+ 
+                String str1 = sf.toString();
+                System.out.println(str1);
+                /*
+                String str2 = str1.substring(str1.indexOf("Objects")-60,str1.indexOf("Objects"));
+                str = str2.substring(0,10);
+                str.trim();*/
+ 
+                FileWriter fw = new FileWriter("d:\\meminfo.txt",true);
+                fw.flush();
+                fw.write(str1);
+                //fw.write("==========================" + "\n");
+                fw.close();
+ 
+            }catch(InterruptedException e){
+                System.out.println(e);
+            }finally{
+                try{
+                    proc.destroy();
+                }catch(Exception e2){
+                    System.out.println(e2);
+                }
+            }
+        } catch (Exception StringIndexOutOfBoundsExcepiton) {
+            // TODO Auto-generated catch block
+            System.out.println("请检查设备是否连接");
+        }
+ 
+        return str;
+    }
+}

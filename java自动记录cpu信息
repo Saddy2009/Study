@@ -1,0 +1,122 @@
+package com.dtest;
+ 
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.InputStreamReader;
+ 
+class CpuInfo{
+    public static String getcpu(String packageName) throws Exception{
+        String str = null;
+ 
+        try {
+            Runtime runtime = Runtime.getRuntime();
+            Process proc = runtime.exec("adb shell dumpsys cpuinfo | grep " + packageName);
+ 
+            try{
+                //如果执行时非正常终止,则打印进程退出的返回值,waitFor()=0 为正常终止.
+                //waitFor()方法将导致当前的线程等待.如果必要的话.直到由该Process对象表示的进程已经终止.此方法将立即返回,如果子进程已经终止.
+                //如果子进程尚未终止,则调用线程将被阻塞,直到子进程退出.
+                if(proc.waitFor() != 0){
+                    System.err.println("exit value = " + proc.exitValue());
+                }
+ 
+                //创建一个BufferedReader对象,且里边装的内容为执行proc返回的值(将proc的返回值作为输入流)
+                BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+ 
+                //创建一个空StringBuffer对象,用来装输出内容
+                StringBuffer sr = new StringBuffer();
+                String line = null;
+ 
+                //逐行读取返回输入流内容并添加到stringbuffer对象中,每次添加都进行换行.
+                while((line = br.readLine()) != null){
+                    sr.append(line + "\n");
+                }
+ 
+                String str1 = sr.toString();
+                System.out.println(str1);
+                /*
+                String str2 = str1.substring(str1.indexOf(packageName),str1.indexOf(packageName) + 28);
+                str = str2.substring(18,23);*/
+ 
+                FileWriter fw = new FileWriter("d:\\cpuinfo.txt",true);
+                fw.flush();
+                fw.write(str1);
+                //fw.write("==========================" + "\n");
+                fw.close();
+ 
+            }catch(InterruptedException e){
+                System.out.println(e);
+            }finally{
+                try{
+                    proc.destroy();
+                }catch(Exception e2){
+                    //System.out.println(e2);
+                }
+            }
+        } catch (Exception StringIndexOutOfBoundsExcepiton) {
+            // TODO Auto-generated catch block
+            System.out.println("请检查设备是否连接");
+        }            
+ 
+        return str;
+    }
+}
+ 
+    /*
+    public static double Cpu(String packageName) throws IOException{
+ 
+        double Cpu = 0;
+ 
+        try{
+            Runtime runtime = Runtime.getRuntime();
+            Process proc = runtime.exec("adb shell top -n 5 | grep " + packageName);
+            try{
+                //如果执行时非正常终止,则打印进程退出的返回值,waitFor()=0 为正常终止.
+                //waitFor()方法将导致当前的线程等待.如果必要的话.直到由该Process对象表示的进程已经终止.此方法将立即返回,如果子进程已经终止.
+                //如果子进程尚未终止,则调用线程将被阻塞,直到子进程退出.
+                if(proc.waitFor() != 0){
+                    System.err.println("exit value = " + proc.exitValue());
+                }
+ 
+                //创建一个BufferedReader对象,且里边装的内容为执行proc返回的值(将proc的返回值作为输入流)
+                BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+ 
+                //创建一个空StringBuffer对象,用来装输出内容
+                StringBuffer stringBuffer = new StringBuffer();
+ 
+                String line = null;
+                //逐行读取返回输入流内容并添加到stringbuffer对象中,每次添加都进行换行.
+                while((line = br.readLine()) != null){
+                    stringBuffer.append(line + "\n");
+                }
+ 
+                String str1 = stringBuffer.toString();
+                System.out.println(str1);
+ 
+                //BufferedReader reader = new BufferedReader(new FileReader("d:\\a.csv"));
+                FileWriter fw = new FileWriter("d:\\cpuinfo.text",true);
+                fw.flush();
+                fw.write(str1);
+                fw.close();
+ 
+                String str3 = str1.substring(str1.indexOf(packageName)-43,str1.indexOf(packageName));
+ 
+                String cpu = str3.substring(0,4);
+                       cpu =cpu.trim();
+                       Cpu = Double.parseDouble(cpu);
+ 
+            }catch(InterruptedException e){
+                System.err.println(e);
+            }finally{
+                try{
+                    proc.destroy();
+                }catch(Exception e2){
+                    //System.out.println("test");
+                }
+            }
+        }catch(Exception StringIndexOutOfBoundsExcepiton){
+            //System.out.println("请检查设备是否连接");
+        }
+        return Cpu;
+    }
+    */
